@@ -1,0 +1,25 @@
+# Inspectify - Vehicle Damage Detection Service
+# https://github.com/your-org/inspectify
+
+services:
+  api:
+    container_name: inspectify.api
+    build: .
+    environment:
+      MODEL_PATH: /app/models/yolo11m_trained.pt
+      ENV: testing
+      SAVE_ANNOTATED_IMAGES: "true"
+      IMAGE_RETENTION_HOURS: "24"
+      OUTPUT_DIR: /app/outputs/inspections
+      MAX_STORAGE_GB: "10"
+    ports:
+      - "8000:8000"
+    volumes:
+      # Model is now baked into the image, no need to mount
+      - inspectify-logs:/app/logs
+      - inspectify-outputs:/app/outputs
+    restart: unless-stopped
+
+volumes:
+  inspectify-logs:
+  inspectify-outputs:

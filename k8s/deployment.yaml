@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inspectify-api
+  labels:
+    app: inspectify
+    component: api
+spec:
+  replicas: 2  # Run 2 instances for high availability
+  selector:
+    matchLabels:
+      app: inspectify
+      component: api
+  template:
+    metadata:
+      labels:
+        app: inspectify
+        component: api
+    spec:
+      containers:
+      - name: inspectify-api
+        image: inspectify:latest
+        imagePullPolicy: IfNotPresent  # Use local image
+        ports:
+        - containerPort: 8000
+        env:
+        - name: MODEL_PATH
+          value: /app/models/yolo11m_trained.pt
+        - name: ENV
+          value: testing
+        - name: SAVE_ANNOTATED_IMAGES
+          value: "true"
+        - name: IMAGE_RETENTION_HOURS
+          value: "24"
+        - name: OUTPUT_DIR
+          value: /app/outputs/inspections
+        - name: MAX_STORAGE_GB
+          value: "10"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        # Health probes commented out - add /health endpoint to your API first
+        # livenessProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 8000
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 10
+        # readinessProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 8000
+        #   initialDelaySeconds: 10
+        #   periodSeconds: 5

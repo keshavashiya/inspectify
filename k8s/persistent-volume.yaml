@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: inspectify-models-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadOnlyMany
+  hostPath:
+    path: /data/inspectify/models  # Path on Minikube node
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: inspectify-models-pvc
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 5Gi

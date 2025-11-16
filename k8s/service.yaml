@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: inspectify-api
+spec:
+  type: LoadBalancer  # Exposes service externally
+  selector:
+    app: inspectify
+    component: api
+  ports:
+  - protocol: TCP
+    port: 80          # External port
+    targetPort: 8000  # Container port
