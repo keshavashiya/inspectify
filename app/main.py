@@ -1,4 +1,5 @@
 import logging
+import os
 import threading
 import time
 import uuid
@@ -11,7 +12,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 
 from app.cache import inspection_cache
-from app.config import SAVE_ANNOTATED_IMAGES, CLASS_CONF_THRESHOLDS
+from app.config import SAVE_ANNOTATED_IMAGES, CLASS_CONF_THRESHOLDS, MODEL_PATH, MODEL_URL
+import requests
 from app.detection import YOLO11mDetector
 from app.image_processor import ImageProcessor
 from app.image_storage import image_storage
@@ -55,7 +57,15 @@ async def startup_event():
     logger.info("Initializing services...")
 
     try:
-        detector = YOLO11mDetector(model_path="models/yolo11m_trained.pt")
+        model_path = str(MODEL_PATH)
+        if MODEL_URL and not os.path.exists(model_path):
+            r = requests.get(MODEL_URL, stream=True, timeout=60)
+            r.raise_for_status()
+            with open(model_path, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024 * 1024):
+                    if chunk:
+                        f.write(chunk)
+        detector = YOLO11mDetector(model_path=model_path)
         image_processor = ImageProcessor(max_size_mb=50)
         retinex_enhancer = RetinexEnhancer()
 

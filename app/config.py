@@ -1,6 +1,7 @@
 import os
 import json
 from pathlib import Path
+from pathlib import Path
 
 # Image storage configuration
 SAVE_ANNOTATED_IMAGES = os.getenv("SAVE_ANNOTATED_IMAGES", "true").lower() == "true"
@@ -15,6 +16,11 @@ try:
 except Exception:
     CLASS_CONF_THRESHOLDS = None
 
+MODEL_DIR = Path(os.getenv("MODEL_DIR", "models"))
+MODEL_PATH = Path(os.getenv("MODEL_PATH", str(MODEL_DIR / "yolo11m_trained.pt")))
+MODEL_URL = os.getenv("MODEL_URL", "")
+
 # Ensure output directory exists
 if SAVE_ANNOTATED_IMAGES:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
