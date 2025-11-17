@@ -40,6 +40,10 @@ class DetectionRequest(BaseModel):
     inspection_type: str = Field("departure", description="departure|return")
     confidence_threshold: float = Field(0.5, ge=0.0, le=1.0)
     enable_enhancement: bool = Field(True, description="Apply low-light enhancement")
+    iou_threshold: float = Field(0.5, ge=0.0, le=1.0)
+    enable_tta: bool = Field(False, description="Enable test-time augmentation")
+    img_size: int = Field(1280, ge=320, le=2048, description="Inference image size")
+    agnostic_nms: bool = Field(False, description="Class-agnostic NMS")
 
 
 class DetectionResponse(BaseModel):

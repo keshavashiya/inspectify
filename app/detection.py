@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import torch
@@ -28,9 +28,24 @@ class YOLO11mDetector:
         logger.info(f"YOLO11m loaded on {self.device}")
 
     def predict(
-        self, image_array: np.ndarray, conf: float = 0.5
+        self,
+        image_array: np.ndarray,
+        conf: float = 0.5,
+        iou: float = 0.5,
+        imgsz: int = 1280,
+        augment: bool = False,
+        agnostic_nms: bool = False,
+        class_thresholds: Optional[Dict[str, float]] = None,
     ) -> Tuple[List[Dict], np.ndarray]:
-        results = self.model(image_array, conf=conf, verbose=False)
+        results = self.model(
+            image_array,
+            conf=conf,
+            iou=iou,
+            imgsz=imgsz,
+            augment=augment,
+            agnostic_nms=agnostic_nms,
+            verbose=False,
+        )
 
         if not results:
             return [], image_array
@@ -56,7 +71,13 @@ class YOLO11mDetector:
                     * (box.xyxy[0][3] - box.xyxy[0][1])
                 ),
             }
-            detections.append(detection)
+            th = None
+            if class_thresholds is not None:
+                th = class_thresholds.get(detection["class_name"])  
+            if th is not None and detection["confidence"] < th:
+                pass
+            else:
+                detections.append(detection)
 
         annotated_image = result.plot()
         return detections, annotated_image

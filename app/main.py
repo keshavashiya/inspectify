@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 
 from app.cache import inspection_cache
-from app.config import SAVE_ANNOTATED_IMAGES
+from app.config import SAVE_ANNOTATED_IMAGES, CLASS_CONF_THRESHOLDS
 from app.detection import YOLO11mDetector
 from app.image_processor import ImageProcessor
 from app.image_storage import image_storage
@@ -116,7 +116,13 @@ async def detect_damage_from_url(request: DetectionRequest):
 
         # Run inference
         detections, annotated_image = detector.predict(
-            image, conf=request.confidence_threshold
+            image,
+            conf=request.confidence_threshold,
+            iou=request.iou_threshold,
+            imgsz=request.img_size,
+            augment=request.enable_tta,
+            agnostic_nms=request.agnostic_nms,
+            class_thresholds=CLASS_CONF_THRESHOLDS,
         )
         metrics = detector.calculate_metrics(detections)
 
@@ -223,7 +229,15 @@ async def detect_damage_from_upload(
             image, image_enhanced = retinex_enhancer.enhance_if_needed(image)
 
         # Run inference
-        detections, annotated_image = detector.predict(image, conf=confidence_threshold)
+        detections, annotated_image = detector.predict(
+            image,
+            conf=confidence_threshold,
+            iou=0.5,
+            imgsz=1280,
+            augment=False,
+            agnostic_nms=False,
+            class_thresholds=CLASS_CONF_THRESHOLDS,
+        )
         metrics = detector.calculate_metrics(detections)
 
         # Format response

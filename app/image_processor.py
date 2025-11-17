@@ -50,7 +50,7 @@ class ImageProcessor:
             "width": image.shape[1],
             "height": image.shape[0],
             "brightness": float(np.mean(gray)),
-            "is_low_light": np.mean(gray) < 90,
+            "is_low_light": np.mean(gray) < 110,
         }
 
     def resize_if_needed(self, image: np.ndarray, max_width: int = 1280) -> np.ndarray:

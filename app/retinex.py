@@ -12,7 +12,7 @@ class RetinexEnhancer:
         pass
 
     def enhance_if_needed(
-        self, image: np.ndarray, brightness_threshold: int = 90
+        self, image: np.ndarray, brightness_threshold: int = 110
     ) -> Tuple[np.ndarray, bool]:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         brightness = np.mean(gray)
